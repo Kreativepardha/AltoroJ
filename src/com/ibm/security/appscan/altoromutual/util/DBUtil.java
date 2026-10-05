@@ -513,17 +513,22 @@ public class DBUtil {
 
 	
 	public static long storeFeedback(String name, String email, String subject, String comments) {
-		try{ 
+		try {
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
-			statement.execute("INSERT INTO FEEDBACK (NAME,EMAIL,SUBJECT,COMMENTS) VALUES ('"+name+"', '"+email+"', '"+subject+"', '"+comments+"')", Statement.RETURN_GENERATED_KEYS);
-			ResultSet rs= statement.getGeneratedKeys();
+			String sql = "INSERT INTO FEEDBACK (NAME, EMAIL, SUBJECT, COMMENTS) VALUES (?, ?, ?, ?)";
+			java.sql.PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			statement.setString(1, name);
+			statement.setString(2, email);
+			statement.setString(3, subject);
+			statement.setString(4, comments);
+			statement.execute();
+			ResultSet rs = statement.getGeneratedKeys();
 			long id = -1;
-			if (rs.next()){
+			if (rs.next()) {
 				id = rs.getLong(1);
 			}
 			return id;
-		} catch (SQLException e){
+		} catch (SQLException e) {
 			Log4AltoroJ.getInstance().logError(e.getMessage());
 			return -1;
 		}
